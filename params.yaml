@@ -1,0 +1,19 @@
+model:
+  shape: 512
+  lambda_gp: 10
+  lambda_pixel: 100
+  batch_size: 6
+  lr_factor: 3
+  learning_rate: 1.e-4
+  beta_1: 0.5
+  beta_2: 0.9
+  gradient_clip_val: 1000
+
+data:
+  seed: 13
+  data_dir: '/share/gpu4/pbhambra/n_body_sims/latin_hypercube'
+  val_size: 0.1
+
+test:
+  interpolate_z: [0.25, 0.75]
+  n_success: 64

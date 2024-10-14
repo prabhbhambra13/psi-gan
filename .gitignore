@@ -1,0 +1,8 @@
+*.sh
+!save_quijote.sh
+/out
+/__pycache__
+plot*.*
+*.wdm
+*.pkl
+validate.py
