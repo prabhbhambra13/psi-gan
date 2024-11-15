@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from tqdm import tqdm, trange
-from itertools import product
+from itertools import product, combinations_with_replacement
 
 import torch
 
@@ -49,25 +49,15 @@ def calc_and_save_metrics(model, x, z_bins, titles, out_dir, test_sim, redshift)
     df_power = df_power.assign(label=titles)
     df_power.to_csv(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_power_spectrum.csv', mode='a', index=False, header=(not Path(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_power_spectrum.csv').is_file()))
 
-    k1 = 0.4
-    k2 = 0.6
-    theta, bi, red = model.bispectrum(x, k1, k2)
-    df_bi = pd.DataFrame(data=bi, columns=theta.tolist())
-    df_bi = df_bi.assign(label=titles)
-    df_bi.to_csv(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_bispectrum_{k1}_{k2}.csv', mode='a', index=False, header=(not Path(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_bispectrum_{k1}_{k2}.csv').is_file()))
-    df_red = pd.DataFrame(data=red, columns=theta.tolist())
-    df_red = df_red.assign(label=titles)
-    df_red.to_csv(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_reduced_bispectrum_{k1}_{k2}.csv', mode='a', index=False, header=(not Path(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_reduced_bispectrum_{k1}_{k2}.csv').is_file()))
-
-    k1 = 0.4
-    k2 = 0.4
-    theta, bi, red = model.bispectrum(x, k1, k2)
-    df_bi = pd.DataFrame(data=bi, columns=theta.tolist())
-    df_bi = df_bi.assign(label=titles)
-    df_bi.to_csv(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_bispectrum_{k1}_{k2}.csv', mode='a', index=False, header=(not Path(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_bispectrum_{k1}_{k2}.csv').is_file()))
-    df_red = pd.DataFrame(data=red, columns=theta.tolist())
-    df_red = df_red.assign(label=titles)
-    df_red.to_csv(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_reduced_bispectrum_{k1}_{k2}.csv', mode='a', index=False, header=(not Path(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_reduced_bispectrum_{k1}_{k2}.csv').is_file()))
+    k_values = [0.05, 0.2, 0.4, 0.6]
+    for k1, k2 in list(combinations_with_replacement(k_values, 2))[2:4]:
+        theta, bi, red = model.bispectrum(x, k1, k2)
+        df_bi = pd.DataFrame(data=bi, columns=theta.tolist())
+        df_bi = df_bi.assign(label=titles)
+        df_bi.to_csv(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_bispectrum_{k1}_{k2}.csv', mode='a', index=False, header=(not Path(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_bispectrum_{k1}_{k2}.csv').is_file()))
+        df_red = pd.DataFrame(data=red, columns=theta.tolist())
+        df_red = df_red.assign(label=titles)
+        df_red.to_csv(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_reduced_bispectrum_{k1}_{k2}.csv', mode='a', index=False, header=(not Path(f'{out_dir}/unseen_cosmology_{test_sim}/results/z={redshift if redshift==0.5 else int(redshift)}_reduced_bispectrum_{k1}_{k2}.csv').is_file()))
 
 def main():
     with open('params.yaml', 'r') as f:
